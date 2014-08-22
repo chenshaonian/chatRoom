@@ -3,9 +3,9 @@ function divEscapedContentElement(message){
 }
 
 function divSystemContentElement(message){
-	return $('<div></div>').html('<i>' + message +'</i>');
+	return $('<div></div>').html('<strong>' + message +'</strong>');
 }
-function processUserInput(charApp, socket){
+function processUserInput(charApp, socket, name){
 	var message = $('#send-message').val();
 	var systemMessage;
 
@@ -16,7 +16,7 @@ function processUserInput(charApp, socket){
 		}
 	}else{
 		charApp.sendMessage($('#room').text(), message);
-		$('#messages').append(divEscapedContentElement(message));
+		$('#messages').append(divEscapedContentElement(name+':'+message));
 		$('#messages').scrollTop($('#messages').prop('scrollHeight'));
 	}
 	$('#send-message').val('');
@@ -25,11 +25,12 @@ function processUserInput(charApp, socket){
 var socket = io.connect();
 $(document).ready(function(){
 	var charApp = new Chat(socket);
-
+	var name = '';
 	socket.on('nameResult', function (result) {
 		var message;
 		if(result.success){
 			message = 'You are now known as ' + result.name + '.';
+			name = result.name ;
 		}else{
 			message = result.message;
 		}
@@ -62,7 +63,8 @@ $(document).ready(function(){
 	}, 1000);
 	$('#send-message').focus();
 	$('#send-form').submit(function(){
-		processUserInput(charApp, socket);
+		console.log(name);
+		processUserInput(charApp, socket, name);
 		return false;
 	})
 
